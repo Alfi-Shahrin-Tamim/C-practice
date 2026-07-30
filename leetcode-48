@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+void rotate(int** matrix, int matrixSize, int* matrixColSize) {
+    int i,j, n = matrixSize,k;
+    for (i = 0; i < n; i++){
+      for(j = i + 1; j < n; j++){
+          int temp = matrix[i][j];
+          matrix[i][j] = matrix[j][i];
+          matrix[j][i] = temp;
+      }
+    }
+    
+    for(i = 0; i < n; i++){
+        j = 0;
+        k = n - 1;
+        while (k > j){
+          int temp = matrix[i][j];
+          matrix[i][j] = matrix[i][k];
+          matrix[i][k] = temp;
+          j++;
+          k--;
+        }
+    }
+}
+
+int main(){
+    int row0[] = {1, 2, 3};
+    int row1[] = {4, 5, 6};
+    int row2[] = {7, 8, 9};
+    int* arr[] = {row0, row1, row2};
+
+    int row = 3;
+    int column[] = {3, 3, 3};                
+    rotate(arr, row, column);
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 3; j++) printf("%d ", arr[i][j]);
+      printf("\n");
+  }
+}
