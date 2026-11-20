@@ -1,5 +1,4 @@
 
-
 struct Node {
     int data;
     struct Node* next;
@@ -11,6 +10,10 @@ struct Node* AddToEnd(int x, struct Node** tail);
 void         PrintList(struct Node** tail);
 int          FindIndex(int x, struct Node** tail);
 int          ListSize(struct Node** tail);
+void         DeleteFromBegin(struct Node** tail);
+void         DeleteFromEnd(struct Node** tail);
+void         FreeList(struct Node** tail);
+void         Rotate(struct Node** tail, int forward);
 
 struct Node* GetNewNode(int x){
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
@@ -19,6 +22,15 @@ struct Node* GetNewNode(int x){
     newNode->next = newNode;
     return newNode;
 }
+
+void Rotate(struct Node** tail, int forward){
+    if(*tail == NULL) return;
+    int size = ListSize(tail);
+    int rotations = forward % size;
+    if(rotations < 0) rotations = size + rotations;
+    for(int i = 0; i < rotations; i++) *tail = (*tail)->next;
+}
+
 struct Node* AddToBegin(int x, struct Node** tail){
     struct Node* temp2 = GetNewNode(x);
     if(temp2 == NULL) return NULL;
@@ -43,6 +55,34 @@ struct Node* AddToEnd(int x, struct Node** tail){
     return temp2;
 }
 
+void DeleteFromBegin(struct Node** tail){
+    if(*tail == NULL) return;
+    struct Node* temp = (*tail)->next;
+    if(temp == (*tail)) {
+        (*tail) = NULL;
+        free(temp);
+        return;
+    }
+    (*tail)->next = (*tail)->next->next;
+    free(temp);
+    return;
+}
+
+void DeleteFromEnd(struct Node** tail){
+    if(*tail == NULL) return;
+    struct Node* temp = (*tail)->next;
+    if(temp == (*tail)) {
+        (*tail) = NULL;
+        free(temp);
+        return;
+    }    
+    while(temp->next != (*tail)) temp = temp->next;
+    struct Node* temp2 = (*tail);
+    *tail = temp;
+    temp->next = temp2->next;
+    free(temp2);
+    return;
+}
 int FindIndex(int x, struct Node** tail){
     if(*tail == NULL) return -1;
     struct Node* temp = (*tail)->next;
@@ -65,6 +105,23 @@ int ListSize(struct Node** tail){
         i++;
         if(temp == *tail) return i;
     }
+}
+
+void FreeList(struct Node** tail){
+    if(*tail == NULL) return;
+    struct Node* temp1 = (*tail)->next;
+    if(temp1 == *tail) {
+        free(temp1);
+        *tail = NULL;
+        return;
+    }
+    while(temp1 != *tail){
+        struct Node* temp2 = temp1->next;
+        free(temp1);
+        temp1 = temp2;
+    }
+    free(*tail);
+    *tail = NULL;
 }
 
 void PrintList(struct Node** tail){
