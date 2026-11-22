@@ -28,7 +28,21 @@ struct Node* GetNewNode(int x){
     return newNode;
 }
 
-//Warning, this function will turn multinode lists into a single node
+//This does not modify the list, only returns a pointer to the survivor Node.
+struct Node* Josephus(struct Node** tail, int k){
+    if(*tail == NULL || k < 1) return NULL;
+    int size = ListSize(tail);
+
+    int x = 0;
+    for(int i = 2; i <= size; i++) x = (x + k) % i;
+    x = x + 1;
+
+    struct Node* temp = *tail;
+    for(int i = 0; i < x; i++) temp = temp->next;
+    return temp;
+}
+
+//Warning, this function will turn multinode lists into a single node (deletes all non-surviving Nodes)
 struct Node* Josephus(struct Node** tail, int k){
     if(*tail == NULL || k < 1) return NULL;
     if((*tail)->next == *tail) return *tail;
