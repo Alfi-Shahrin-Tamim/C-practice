@@ -17,6 +17,8 @@ void         ReplaceAtPos(struct Node** tail, int pos, int val);
 void         DeleteByValue(struct Node** tail, int val);
 void         DeleteAtPos(struct Node** tail, int pos);
 void         Reverse(struct Node** tail);
+struct Node* Josephus(struct Node** tail, int k);
+
 
 struct Node* GetNewNode(int x){
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
@@ -24,6 +26,17 @@ struct Node* GetNewNode(int x){
     newNode->data = x;
     newNode->next = newNode;
     return newNode;
+}
+
+struct Node* Josephus(struct Node** tail, int k){
+    if(*tail == NULL || k < 1) return NULL;
+    if((*tail)->next == *tail) return *tail;
+    int size = ListSize(tail);
+    for(int i = 1; i < size; i++){
+        Rotate(tail, k - 1);
+        DeleteFromBegin(tail);
+    }
+    return *tail; 
 }
 
 void Reverse(struct Node** tail){
