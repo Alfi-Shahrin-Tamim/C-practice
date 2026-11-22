@@ -28,6 +28,7 @@ struct Node* GetNewNode(int x){
     return newNode;
 }
 
+//Warning, this function will turn multinode lists into a single node
 struct Node* Josephus(struct Node** tail, int k){
     if(*tail == NULL || k < 1) return NULL;
     if((*tail)->next == *tail) return *tail;
