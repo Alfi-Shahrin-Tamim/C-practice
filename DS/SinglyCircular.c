@@ -1,19 +1,22 @@
-
 struct Node {
     int data;
     struct Node* next;
 };
 
 struct Node* GetNewNode(int x);
-struct Node* AddToBegin(int x, struct Node** tail);
-struct Node* AddToEnd(int x, struct Node** tail);
+void         AddToBegin(int x, struct Node** tail);
+void         AddToEnd(int x, struct Node** tail);
 void         PrintList(struct Node** tail);
-int          FindIndex(int x, struct Node** tail);
+int          FindIndex(int val, struct Node** tail);
 int          ListSize(struct Node** tail);
 void         DeleteFromBegin(struct Node** tail);
 void         DeleteFromEnd(struct Node** tail);
 void         FreeList(struct Node** tail);
 void         Rotate(struct Node** tail, int forward);
+void         ReplaceAtPos(struct Node** tail, int pos, int val);
+void         DeleteByValue(struct Node** tail, int val);
+void         DeleteAtPos(struct Node** tail, int pos);
+void         Reverse(struct Node** tail);
 
 struct Node* GetNewNode(int x){
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
@@ -21,6 +24,20 @@ struct Node* GetNewNode(int x){
     newNode->data = x;
     newNode->next = newNode;
     return newNode;
+}
+
+void Reverse(struct Node** tail){
+    if(*tail == NULL || *tail == (*tail)->next) return;
+    struct Node* head = (*tail)->next;
+    struct Node* prev = *tail;
+    struct Node* current = head;
+    do{
+        struct Node* next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    } while ( prev != *tail);
+    *tail = head;
 }
 
 void Rotate(struct Node** tail, int forward){
@@ -31,28 +48,33 @@ void Rotate(struct Node** tail, int forward){
     for(int i = 0; i < rotations; i++) *tail = (*tail)->next;
 }
 
-struct Node* AddToBegin(int x, struct Node** tail){
+void AddToBegin(int x, struct Node** tail){
     struct Node* temp2 = GetNewNode(x);
-    if(temp2 == NULL) return NULL;
+    if(temp2 == NULL) return;
     if(*tail == NULL) {
         *tail = temp2;
-        return temp2;
+        return;
     }
     temp2->next = (*tail)->next;
     (*tail)->next = temp2;
-    return temp2;
 }
-struct Node* AddToEnd(int x, struct Node** tail){
-    struct Node* temp2 = GetNewNode(x);
-    if(temp2 == NULL) return NULL;
+void AddToEnd(int x, struct Node** tail){
+    struct Node* temp = GetNewNode(x);
+    if(temp == NULL) return;
     if(*tail == NULL){
-        *tail = temp2;
-        return temp2;
+        *tail = temp;
+        return;
     }
-    temp2->next = (*tail)->next;
-    (*tail)->next = temp2;
-    *tail = temp2;
-    return temp2;
+    temp->next = (*tail)->next;
+    (*tail)->next = temp;
+    *tail = temp;
+}
+
+void ReplaceAtPos(struct Node** tail, int pos, int val){
+    if(*tail == NULL || pos < 1 || pos > ListSize(tail)) return;
+    struct Node* temp = *tail;
+    for(int i = 0; i < pos; i++) temp = temp->next;
+    temp->data = val;
 }
 
 void DeleteFromBegin(struct Node** tail){
@@ -83,14 +105,63 @@ void DeleteFromEnd(struct Node** tail){
     free(temp2);
     return;
 }
-int FindIndex(int x, struct Node** tail){
+
+void DeleteByValue(struct Node** tail, int val){
+    if(*tail == NULL) return;
+    if(*tail == (*tail)->next){
+        if((*tail)->data == val) {
+            free(*tail);
+            *tail = NULL;
+        }
+        return;
+    }
+    struct Node* temp1 = *tail;
+    while(temp1->next != *tail) {
+        if(temp1->next->data == val){
+            struct Node* temp2 = temp1->next;
+            temp1->next = temp2->next;
+            free(temp2);
+            return;
+        }
+        temp1 = temp1->next;
+    }
+    if ((*tail)->data == val){
+        temp1->next = (*tail)->next;
+        struct Node* temp2 = *tail;
+        *tail = temp1;
+        free(temp2);
+    }
+}
+
+void DeleteAtPos(struct Node** tail, int pos){
+    if(*tail == NULL || pos < 1) return;
+    if((*tail)->next == *tail){
+        if(pos == 1){
+            free(*tail);
+            *tail = NULL;
+        }
+        return;
+    }
+    int size = ListSize(tail);
+    if(pos > size) return;    
+    struct Node* del = *tail;
+    struct Node* temp = *tail;
+    for(int i = 0; i < pos; i++) del = del->next;
+    while(temp->next != del) temp = temp->next;
+    temp->next = del->next;
+    if(del == *tail) *tail = temp;
+    free(del);
+}
+
+
+int FindIndex(int val, struct Node** tail){
     if(*tail == NULL) return -1;
     struct Node* temp = (*tail)->next;
-    if(temp->data == x) return 1;
+    if(temp->data == val) return 1;
     int i = 1;
     while(1){
         temp = temp->next; i++;
-        if(temp->data == x) return i;
+        if(temp->data == val) return i;
         if(temp == (*tail)->next) return -1;
     }
 }
@@ -138,5 +209,4 @@ void PrintList(struct Node** tail){
         if(temp == (*tail)->next) break;
     }
     printf("\n");
-
 }
